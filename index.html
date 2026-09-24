@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MoonTech Financial OS · Prototype v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F5FA; --surface:#FFFFFF; --surface-2:#F8F9FD; --line:#E3E6F0; --line-2:#EEF0F6;
+  --ink:#10143A; --ink-2:#4B5277; --ink-3:#8A90AE;
+  --night:#121838; --night-2:#1B2250; --night-text:#C9CEEA;
+  --moon:#E4B040; --moon-soft:#FBF1D9;
+  --in:#178A6A; --in-soft:#E3F4EE;
+  --owed:#D2583C; --owed-soft:#FBE9E4;
+  --credit:#5B4BD6; --credit-soft:#ECE9FC;
+  --held:#2F6FD1; --held-soft:#E4EEFB;
+  --r:14px; --r-s:9px;
+  --font:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --display:'Fraunces',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1026; --surface:#141A38; --surface-2:#10152F; --line:#252D55; --line-2:#1D2448;
+    --ink:#EDEFFA; --ink-2:#AEB4D4; --ink-3:#7A81A6;
+    --moon-soft:#3A3014; --in-soft:#103A30; --owed-soft:#3D1D16; --credit-soft:#26204F; --held-soft:#16294A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1026; --surface:#141A38; --surface-2:#10152F; --line:#252D55; --line-2:#1D2448;
+  --ink:#EDEFFA; --ink-2:#AEB4D4; --ink-3:#7A81A6;
+  --moon-soft:#3A3014; --in-soft:#103A30; --owed-soft:#3D1D16; --credit-soft:#26204F; --held-soft:#16294A;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--moon);outline-offset:2px}
+.mono{font-family:var(--mono);font-size:.92em}
+.num{font-family:var(--display);font-weight:500;letter-spacing:-.01em;line-height:1}
+
+/* ---------- shell ---------- */
+.shell{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100vh}
+.side{background:var(--night);color:var(--night-text);padding:22px 14px;display:flex;flex-direction:column;gap:24px;position:sticky;top:0;height:100vh}
+.logo{display:flex;align-items:center;gap:11px;padding:0 8px}
+.moonball{width:30px;height:30px;border-radius:50%;flex-shrink:0;background:radial-gradient(circle at 33% 30%,#FFF0C4 0%,var(--moon) 48%,#A97A1C 100%);box-shadow:0 0 0 4px #E4B04018}
+.logo b{display:block;color:#fff;font-family:var(--display);font-weight:700;font-size:19px;line-height:1.1}
+.logo span{font-size:12px;color:#8C93BD}
+.navgrp p{margin:0 0 6px;padding:0 10px;font-size:11px;color:#6F77A6;font-weight:600}
+.navbtn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;border-radius:9px;background:transparent;color:var(--night-text);font-size:14px;font-weight:500;text-align:left}
+.navbtn:hover{background:var(--night-2);color:#fff}
+.navbtn[aria-current="page"]{background:#E4B0401F;color:var(--moon);font-weight:600}
+.navbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.side .foot{margin-top:auto;font-size:12px;color:#8C93BD;padding:12px 10px;border-top:1px solid #262E5C}
+.side .foot b{color:#fff;font-weight:600}
+.main{padding:28px 34px 60px;min-width:0}
+.screen{display:none}
+.screen.on{display:block}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:22px}
+.head h1{margin:0 0 4px;font-family:var(--display);font-weight:700;font-size:28px;letter-spacing:-.015em;line-height:1.15}
+.head p{margin:0;color:var(--ink-2);max-width:62ch}
+.sample{font-size:12px;color:var(--ink-3);border:1px dashed var(--line);border-radius:999px;padding:5px 11px;white-space:nowrap}
+
+/* ---------- primitives ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.card h2{margin:0 0 4px;font-size:15px;font-weight:600}
+.card .sub{margin:0 0 16px;color:var(--ink-3);font-size:13px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.mt{margin-top:16px}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.tag i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.t-in{background:var(--in-soft);color:var(--in)}
+.t-owed{background:var(--owed-soft);color:var(--owed)}
+.t-credit{background:var(--credit-soft);color:var(--credit)}
+.t-held{background:var(--held-soft);color:var(--held)}
+.t-moon{background:var(--moon-soft);color:#9A6B0C}
+.t-mute{background:var(--surface-2);color:var(--ink-3);border:1px solid var(--line)}
+.btn{height:38px;padding:0 15px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{border-color:var(--ink-3)}
+.btn.pri{background:var(--night);border-color:var(--night);color:#fff}
+.btn.gold{background:var(--moon);border-color:var(--moon);color:#1B1606}
+.tblwrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:12px;font-weight:600;color:var(--ink-3);padding:0 12px 10px;white-space:nowrap}
+td{padding:12px;border-top:1px solid var(--line-2);vertical-align:middle}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--surface-2)}
+tr.sel td{background:var(--moon-soft)}
+.who{display:flex;align-items:center;gap:10px}
+.av{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2);flex-shrink:0}
+.meter{height:6px;background:var(--line-2);border-radius:3px;overflow:hidden}
+.meter i{display:block;height:100%;border-radius:3px}
+
+/* ---------- overview: four states ---------- */
+.states{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.state{padding:20px 22px;position:relative;border-left:1px solid var(--line-2)}
+.state:first-child{border-left:0}
+.state .lbl{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin-bottom:12px}
+.state .lbl .n{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.state .num{font-size:32px}
+.state .d{font-size:12.5px;color:var(--ink-3);margin-top:8px;min-height:38px}
+.state::after{content:"";position:absolute;right:-9px;top:50%;width:16px;height:16px;background:var(--surface);border-top:1px solid var(--line-2);border-right:1px solid var(--line-2);transform:translateY(-50%) rotate(45deg);z-index:1}
+.state:last-child::after{display:none}
+.stream .ev{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line-2);font-size:13px}
+.stream .ev:first-of-type{border-top:0}
+.stream .t{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.stream .amt{font-family:var(--mono);font-size:12.5px;font-weight:500}
+.rail{display:flex;align-items:center;gap:11px;padding:10px 0;border-top:1px solid var(--line-2)}
+.rail:first-of-type{border-top:0}
+.rail .ic{width:32px;height:32px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--ink-2)}
+.rail b{display:block;font-size:13.5px;font-weight:600}
+.rail span{font-size:12px;color:var(--ink-3)}
+.rail .tag{margin-left:auto}
+.zone-note{font-size:12px;color:var(--ink-3);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+
+/* ---------- flow ---------- */
+.stagebar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.stagebtn{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:14px 16px;text-align:left;color:var(--ink)}
+.stagebtn .k{font-size:12px;color:var(--ink-3);font-weight:600}
+.stagebtn .v{font-size:15px;font-weight:600;margin-top:3px}
+.stagebtn .s{font-size:12px;color:var(--ink-3);margin-top:6px}
+.stagebtn[aria-pressed="true"]{border-color:var(--night);box-shadow:inset 0 0 0 1px var(--night)}
+.systems{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.sys{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:12.5px;font-weight:600;color:var(--ink-3);transition:all .2s}
+.sys.on{background:var(--night);border-color:var(--night);color:#fff}
+.sys.edge{border-style:dashed}
+.steps{display:flex;flex-direction:column;gap:8px}
+.step{display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;padding:14px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--surface);cursor:pointer;text-align:left;color:var(--ink);width:100%}
+.step:hover{border-color:var(--ink-3)}
+.step.on{border-color:var(--moon);background:var(--moon-soft)}
+.step .no{width:32px;height:32px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:500}
+.step.on .no{background:var(--moon);border-color:var(--moon);color:#1B1606}
+.step b{display:block;font-size:14px;font-weight:600;margin-bottom:2px}
+.step span{font-size:13px;color:var(--ink-2)}
+.pathtoggle{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface);margin-bottom:12px}
+.pathtoggle button{border:0;background:transparent;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--ink-3)}
+.pathtoggle button[aria-pressed="true"]{background:var(--night);color:#fff}
+.callout{border-left:3px solid var(--moon);background:var(--moon-soft);padding:12px 14px;border-radius:0 var(--r-s) var(--r-s) 0;font-size:13px;color:var(--ink)}
+
+/* ---------- credit ---------- */
+.guard{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
+.guardbar{height:12px;border-radius:6px;background:var(--line-2);position:relative;overflow:visible}
+.guardbar .fill{height:100%;border-radius:6px;background:var(--credit)}
+.guardbar .cap{position:absolute;top:-6px;width:2px;height:24px;background:var(--owed)}
+.guardbar .cap span{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--owed);font-weight:600;white-space:nowrap}
+.scorebig{display:flex;align-items:baseline;gap:10px}
+.scorebig .num{font-size:52px}
+.factor{display:grid;grid-template-columns:150px minmax(0,1fr) 90px 52px;gap:12px;align-items:center;padding:9px 0;border-top:1px solid var(--line-2);font-size:13px}
+.factor:first-of-type{border-top:0}
+.factor .val{font-size:12.5px;color:var(--ink-2);text-align:right}
+.factor .pts{font-family:var(--mono);font-size:12px;text-align:right;color:var(--ink-3)}
+.ladder{display:flex;flex-direction:column;gap:6px}
+.rung{display:grid;grid-template-columns:88px minmax(0,1fr);gap:12px;align-items:center;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r-s);font-size:13px;color:var(--ink-3);background:var(--surface)}
+.rung b{color:var(--ink-2);font-weight:600}
+.rung .range{font-family:var(--mono);font-size:12px}
+.rung.on{border-color:currentColor;color:var(--ink);box-shadow:inset 4px 0 0 currentColor}
+.rung.on b{color:var(--ink)}
+.outcome{border-radius:var(--r);padding:18px;margin-top:14px}
+
+/* ---------- phones ---------- */
+.stagewrap{display:grid;grid-template-columns:380px minmax(0,1fr);gap:26px;align-items:start}
+.phone{width:360px;max-width:100%;background:#0E1230;border-radius:40px;padding:12px;box-shadow:0 24px 60px #10143A40;position:relative}
+.scr{background:#F6F7FB;border-radius:30px;overflow:hidden;position:relative;min-height:690px;color:#10143A}
+.pt{padding:20px 20px 18px;color:#fff;position:relative;overflow:hidden;background:linear-gradient(150deg,#1D2552,#10143A)}
+.pt .glow{position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF0C4 0%,#E4B040 40%,transparent 70%);opacity:.45}
+.pt .me{font-size:13px;color:#C9CEEA;position:relative;display:flex;align-items:center;gap:8px}
+.pt .me i{width:26px;height:26px;border-radius:8px;background:#ffffff22;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;font-size:11px;color:#fff}
+.pt .bl{font-size:12px;color:#AEB4D8;margin:18px 0 4px;position:relative}
+.pt .bv{font-family:var(--display);font-weight:500;font-size:34px;position:relative;line-height:1}
+.pt .row{display:flex;gap:22px;margin-top:16px;position:relative}
+.pt .row .k{font-size:11px;color:#AEB4D8}
+.pt .row .v{font-family:var(--mono);font-size:13.5px}
+.pb{padding:16px 18px 22px}
+.pb h4{margin:18px 0 8px;font-size:12px;color:#6A7196;font-weight:600}
+.pb h4:first-child{margin-top:0}
+.acts{display:flex;gap:8px}
+.acts button{flex:1;height:44px;border-radius:12px;border:1px solid #E3E6F0;background:#fff;font-weight:600;font-size:13px;color:#10143A}
+.acts button.k{background:#E4B040;border-color:#E4B040;color:#1B1606}
+.ms{display:flex;gap:6px;align-items:flex-end}
+.ms div{flex:1;border-radius:8px;padding:8px 6px;text-align:center;font-size:11px;font-weight:600;background:#fff;border:1px solid #E3E6F0;color:#8A90AE}
+.ms div.done{background:#E3F4EE;border-color:#BFE6D8;color:#178A6A}
+.ms div.cur{background:#FBF1D9;border-color:#E4B040;color:#8A5D05}
+.prog{height:8px;border-radius:4px;background:#E3E6F0;overflow:hidden;margin-top:10px}
+.prog i{display:block;height:100%;background:#E4B040;border-radius:4px}
+.li{display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid #E9EBF3;font-size:13.5px}
+.li:first-of-type{border-top:0}
+.li .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.li .g{flex:1;min-width:0}
+.li .g b{display:block;font-weight:600;font-size:13.5px}
+.li .g span{font-size:12px;color:#6A7196}
+.li .a{font-family:var(--mono);font-size:13px}
+.payrail{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid #E3E6F0;background:#fff;border-radius:12px;margin-bottom:8px;font-size:13px}
+.payrail .lg{width:30px;height:30px;border-radius:8px;background:#F1F2F8;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+.payrail .st{margin-left:auto;font-size:11.5px;font-weight:600}
+
+/* BNPL popup inside phone */
+.scrim{position:absolute;inset:0;background:#0A0D2499;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+.sheet{background:#fff;width:100%;border-radius:26px 26px 0 0;padding:10px 20px 22px;transform:translateY(100%);transition:transform .38s cubic-bezier(.2,.8,.2,1)}
+.scrim.show .sheet{transform:none}
+.sheet .grab{width:40px;height:4px;border-radius:2px;background:#DADDE9;margin:0 auto 16px}
+.sheet .badge{display:inline-flex;align-items:center;gap:6px;background:#ECE9FC;color:#5B4BD6;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px}
+.sheet h3{font-family:var(--display);font-weight:700;font-size:23px;line-height:1.15;margin:12px 0 6px;color:#10143A}
+.sheet p{margin:0 0 14px;font-size:13.5px;color:#4B5277}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.split div{border:1px solid #E3E6F0;border-radius:12px;padding:11px}
+.split .k{font-size:11px;color:#6A7196}
+.split .v{font-family:var(--mono);font-size:15px;font-weight:500;margin-top:2px}
+.split .d{font-size:11px;color:#8A90AE;margin-top:2px}
+.sheet .fine{font-size:11.5px;color:#8A90AE;margin:0 0 14px}
+.sheet .cta{width:100%;height:48px;border-radius:13px;border:0;background:#10143A;color:#fff;font-weight:700;font-size:14.5px;margin-bottom:8px}
+.sheet .alt{width:100%;height:44px;border-radius:13px;border:1px solid #E3E6F0;background:#fff;color:#10143A;font-weight:600;font-size:13.5px}
+.toast{position:absolute;left:14px;right:14px;top:14px;background:#10143A;color:#fff;border-radius:14px;padding:12px 14px;font-size:13px;transform:translateY(-140%);transition:transform .35s;z-index:5}
+.toast.show{transform:none}
+.toast b{color:#E4B040}
+.explain .item{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;padding:10px 0;border-top:1px solid var(--line-2);font-size:13px}
+.explain .item:first-of-type{border-top:0}
+.explain .item .ck{width:20px;height:20px;border-radius:50%;background:var(--in-soft);color:var(--in);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+
+/* ---------- payout pipeline ---------- */
+.pipe{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+.pipe div{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-s);padding:12px 10px;position:relative}
+.pipe .n{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.pipe b{display:block;font-size:12.5px;font-weight:600;margin:4px 0 6px;line-height:1.3;min-height:33px}
+.pipe .c{font-family:var(--display);font-size:20px}
+.pipe .manual{border-color:var(--owed);border-style:dashed}
+.pipe .manual .n{color:var(--owed)}
+
+/* ---------- ERP ---------- */
+.je{display:none}
+.je.show{display:table-row}
+.je td{background:var(--surface-2);padding:0}
+.jlines{padding:12px 16px 14px 52px}
+.jl{display:grid;grid-template-columns:40px minmax(0,1fr) 120px;gap:10px;font-size:12.5px;padding:4px 0}
+.jl .dc{font-family:var(--mono);font-weight:500}
+.jl .dc.dr{color:var(--held)} .jl .dc.cr{color:var(--in)}
+.jl .am{font-family:var(--mono);text-align:right}
+.caret{display:inline-block;transition:transform .2s;color:var(--ink-3);font-size:11px}
+tr.open .caret{transform:rotate(90deg)}
+.recon td .diff0{color:var(--in);font-weight:600}
+.recon td .diffx{color:var(--owed);font-weight:600}
+.syncline{display:flex;align-items:center;gap:0;margin:4px 0 2px;flex-wrap:wrap}
+.syncline .node{padding:10px 14px;border-radius:var(--r-s);background:var(--surface-2);border:1px solid var(--line);font-size:13px;font-weight:600;text-align:center}
+.syncline .node span{display:block;font-size:11.5px;font-weight:500;color:var(--ink-3)}
+.syncline .node.core{background:var(--night);border-color:var(--night);color:#fff}
+.syncline .node.core span{color:#AEB4D8}
+.syncline .arr{flex:1;min-width:24px;height:2px;background:var(--line);position:relative;margin:0 4px}
+.syncline .arr::after{content:"";position:absolute;right:-1px;top:-4px;border:5px solid transparent;border-left:7px solid var(--line);border-right:0}
+
+/* ---------- wallet mockups ---------- */
+.phones{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start}
+.pcol{display:flex;flex-direction:column;gap:12px;align-items:center}
+.pcol .cap{font-size:13.5px;font-weight:600;color:var(--ink);text-align:center;max-width:300px}
+.pcol .cap span{display:block;font-weight:400;color:var(--ink-3);font-size:12.5px;margin-top:2px}
+.phone.sm{width:316px;border-radius:38px;padding:11px}
+.phone.sm .scr{min-height:664px;border-radius:28px}
+.apbar{display:flex;align-items:center;gap:10px;padding:16px 18px 14px;background:#fff;border-bottom:1px solid #E9EBF3;font-weight:700;font-size:15px;color:#10143A}
+.apbar .bk{width:28px;height:28px;border-radius:8px;background:#F1F2F8;display:flex;align-items:center;justify-content:center;font-size:14px}
+.pb.tab{padding-bottom:84px}
+.tabbar{position:absolute;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid #E9EBF3;padding:9px 0 14px}
+.tabbar span{flex:1;text-align:center;font-size:10.5px;color:#8A90AE;font-weight:600}
+.tabbar span b{display:block;font-size:15px;margin-bottom:1px;font-weight:600}
+.tabbar span.on{color:#10143A}
+.bigamt{font-family:var(--display);font-size:40px;font-weight:500;color:#10143A;text-align:center;line-height:1;padding:18px 0 4px}
+.bigsub{text-align:center;font-size:12px;color:#6A7196;margin-bottom:14px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.chips button{padding:8px 12px;border-radius:10px;border:1px solid #E3E6F0;background:#fff;font-weight:600;font-size:12.5px;color:#10143A}
+.chips button.sel{background:#10143A;color:#fff;border-color:#10143A}
+.tabs-in{display:flex;gap:3px;background:#EEF0F6;border-radius:10px;padding:3px;margin-bottom:12px}
+.tabs-in span{flex:1;text-align:center;padding:6px 4px;border-radius:8px;font-size:12px;font-weight:600;color:#6A7196}
+.tabs-in span.on{background:#fff;color:#10143A;box-shadow:0 1px 2px #10143A14}
+.opt{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid #E3E6F0;border-radius:12px;background:#fff;margin-bottom:8px;width:100%;text-align:left;font-size:13px;color:#10143A}
+.opt .lg{width:32px;height:32px;border-radius:9px;background:#F1F2F8;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11.5px;flex-shrink:0}
+.opt b{display:block;font-weight:600;font-size:13px}
+.opt small{display:block;color:#6A7196;font-size:11.5px}
+.opt .rd{width:18px;height:18px;border-radius:50%;border:2px solid #C8CCDD;margin-left:auto;flex-shrink:0}
+.opt.sel{border-color:#10143A;box-shadow:inset 0 0 0 1px #10143A}
+.opt.sel .rd{border:5px solid #10143A}
+.opt[disabled]{opacity:.5;cursor:not-allowed}
+.sumbox{background:#fff;border:1px solid #E3E6F0;border-radius:12px;padding:10px 14px;margin:6px 0 12px}
+.sumrow{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;color:#4B5277}
+.sumrow b{color:#10143A;font-family:var(--mono);font-weight:500}
+.sumrow.tot{border-top:1px solid #E9EBF3;margin-top:4px;padding-top:9px;color:#10143A;font-weight:600}
+.bigbtn{width:100%;height:48px;border-radius:13px;border:0;background:#10143A;color:#fff;font-weight:700;font-size:14.5px}
+.bigbtn.gold{background:#E4B040;color:#1B1606}
+.fine2{font-size:11.5px;color:#8A90AE;text-align:center;margin:10px 4px 0;line-height:1.45}
+.camp{background:#fff;border:1px solid #E3E6F0;border-radius:13px;padding:12px 13px;margin-bottom:8px}
+.camp .top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px}
+.camp .top b{font-weight:600}
+.camp .meta{font-size:11.5px;color:#6A7196;margin-top:3px}
+.st{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.st.g{background:#E3F4EE;color:#178A6A}.st.b{background:#E4EEFB;color:#2F6FD1}.st.y{background:#FBF1D9;color:#8A5D05}.st.v{background:#ECE9FC;color:#5B4BD6}.st.m{background:#F1F2F8;color:#6A7196}
+.infobar{display:flex;gap:10px;align-items:center;background:#ECE9FC;border-radius:12px;padding:11px 12px;font-size:12px;color:#3D318F;margin-bottom:6px}
+.infobar b{font-weight:700}
+.stmt .r{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 0;border-top:1px solid #E9EBF3;font-size:12.5px;align-items:center}
+.stmt .r:first-child{border-top:0}
+.stmt .r span{display:block;color:#6A7196;font-size:11.5px}
+.stmt .r .a{font-family:var(--mono);font-size:12.5px}
+.stmt .r.bal{background:#F1F2F8;margin:0 -12px;padding:10px 12px;border-radius:10px;border-top:0;font-weight:600}
+.pdf{font-size:11px;font-weight:700;color:#2F6FD1;border:1px solid #D4E2F7;border-radius:6px;padding:2px 6px;margin-left:6px}
+.section-notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:22px}
+.section-notes .card p{margin:0;font-size:13px;color:var(--ink-2)}
+.section-notes .card h2{font-size:14px;margin-bottom:6px}
+@media (max-width:1100px){.section-notes{grid-template-columns:1fr}}
+
+@media (max-width:1100px){
+  .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pipe{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .stagewrap{grid-template-columns:1fr}
+}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;gap:6px;padding:12px}
+  .side .navgrp p,.side .foot{display:none}
+  .navgrp{display:flex;flex-wrap:wrap;gap:4px}
+  .navbtn{width:auto}
+  .main{padding:20px 16px 48px}
+  .g2,.g3,.states,.stagebar{grid-template-columns:1fr}
+  .state::after{display:none}
+  .factor{grid-template-columns:110px minmax(0,1fr) 44px}
+  .factor .val{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="logo"><span class="moonball"></span><div><b>MoonTech</b><span>Financial OS · prototype</span></div></div>
+    <nav class="navgrp" aria-label="Finance">
+      <p>Finance control</p>
+      <button class="navbtn" data-go="overview" aria-current="page"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Money right now</button>
+      <button class="navbtn" data-go="flow"><svg viewBox="0 0 24 24"><path d="M4 6h10M4 12h16M4 18h7"/><circle cx="17" cy="6" r="2"/><circle cx="14" cy="18" r="2"/></svg>Money flow</button>
+      <button class="navbtn" data-go="credit"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Brands &amp; credit</button>
+      <button class="navbtn" data-go="creators"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>Creator payouts</button>
+      <button class="navbtn" data-go="erp"><svg viewBox="0 0 24 24"><path d="M4 7l4-3 4 3 4-3 4 3v13H4z"/><path d="M9 20v-6h6v6"/></svg>ERP sync</button>
+    </nav>
+    <nav class="navgrp" aria-label="In-app">
+      <p>What users see</p>
+      <button class="navbtn" data-go="brandwallet"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12.5h2"/><path d="M3 10h18"/></svg>Brand wallet</button>
+      <button class="navbtn" data-go="creatorwallet"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><circle cx="12" cy="9" r="2.5"/><path d="M9 15h6"/></svg>Creator wallet</button>
+      <button class="navbtn" data-go="brandapp"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>Brand app · BNPL offer</button>
+    </nav>
+    <div class="foot">Signed in as Finance<br><b>Haseeb M.</b><br>Sample data · nothing is saved</div>
+  </aside>
+
+  <main class="main">
+
+  <!-- ================= OVERVIEW ================= -->
+  <section class="screen on" data-screen="overview">
+    <div class="head">
+      <div><h1>Where every dirham is right now</h1>
+      <p>Every unit of credit sits in exactly one of four states. Each move between states is a logged event in the MoonTech ledger, then posted to the ERP.</p></div>
+      <span class="sample">September · month to date</span>
+    </div>
+
+    <div class="states">
+      <div class="state"><div class="lbl"><span class="n" style="background:var(--in)">1</span>Paid in</div><div class="num">$2.14M</div><div class="d">Brand top-ups and milestone prepayments confirmed by the gateway</div></div>
+      <div class="state"><div class="lbl"><span class="n" style="background:var(--held)">2</span>Committed</div><div class="num">$0.86M</div><div class="d">Funding live campaigns, incl. $0.52M ROAS held unearned</div></div>
+      <div class="state"><div class="lbl"><span class="n" style="background:var(--moon)">3</span>Earned</div><div class="num">$0.61M</div><div class="d">Verified by the warehouse; revenue recognised, creator payouts accrued</div></div>
+      <div class="state"><div class="lbl"><span class="n" style="background:var(--owed)">4</span>Paid out</div><div class="num">$0.48M</div><div class="d">Withdrawn by creators and settled at the bank</div></div>
+    </div>
+
+    <div class="grid g4 mt">
+      <div class="card"><h2>Free cash</h2><p class="sub">After creator obligations</p><div class="num" style="font-size:26px">$2.30M</div></div>
+      <div class="card"><h2>Brand credit balances</h2><p class="sub">Unspent wallet credit we owe brands</p><div class="num" style="font-size:26px">$1.28M</div></div>
+      <div class="card"><h2>Credit extended</h2><p class="sub">Credit lines + BNPL outstanding</p><div class="num" style="font-size:26px">$312k</div><div class="meter mt"><i style="width:54%;background:var(--credit)"></i></div><p class="sub" style="margin:6px 0 0">54% of the $575k exposure cap</p></div>
+      <div class="card"><h2>ERP sync</h2><p class="sub">Ledger vs books, today</p><div class="num" style="font-size:26px;color:var(--in)">99.98%</div><p class="sub" style="margin:6px 0 0">3 exceptions open · last sync 2 min ago</p></div>
+    </div>
+
+    <div class="grid mt" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)">
+      <div class="card stream">
+        <h2>Ledger events, live</h2><p class="sub">Every row below already exists in the ERP. Nobody typed it.</p>
+        <div class="ev"><span class="t">10:42</span><span>Ounass paid ROAS milestone 5 · tax invoice MT-2217 issued</span><span class="amt" style="color:var(--in)">+$16,000</span></div>
+        <div class="ev"><span class="t">10:31</span><span>Dar Oud accepted BNPL offer · 50% collected, 50% due 25 Oct</span><span class="amt" style="color:var(--credit)">$9,000</span></div>
+        <div class="ev"><span class="t">09:58</span><span>Campaign C-771 accepted by 5 creators · wallet-to-wallet</span><span class="amt">$4,200</span></div>
+        <div class="ev"><span class="t">09:12</span><span>Sephora milestone 3 verified · $840 shortfall returned as credit</span><span class="amt" style="color:var(--held)">+$840</span></div>
+        <div class="ev"><span class="t">08:40</span><span>Payout batch B-114 matched at bank · 312 creators</span><span class="amt" style="color:var(--owed)">–$61,300</span></div>
+        <div class="ev"><span class="t">08:05</span><span>Kicks KSA hit 38 days overdue · new campaigns paused by rule</span><span class="amt" style="color:var(--owed)">paused</span></div>
+      </div>
+      <div class="card">
+        <h2>Where money touches regulated rails</h2><p class="sub">Only at the edges. Everything in between is MoonTech's own ledger.</p>
+        <div class="rail"><span class="ic">In</span><div><b>Mamo gateway</b><span>Card links and saved cards, brand pay-in</span></div><span class="tag t-in"><i></i>Live</span></div>
+        <div class="rail"><span class="ic">Bk</span><div><b>Bank batch file</b><span>Creator withdrawals and brand fiat refunds</span></div><span class="tag t-in"><i></i>Live</span></div>
+        <div class="rail"><span class="ic">GC</span><div><b>Gift cards</b><span>Cross-border pilot: Egypt, Iraq, Syria</span></div><span class="tag t-moon"><i></i>Pilot Q4</span></div>
+        <div class="rail"><span class="ic">PP</span><div><b>PayPal</b><span>Fallback for hard-to-reach markets</span></div><span class="tag t-mute"><i></i>Ready</span></div>
+        <div class="rail"><span class="ic">Cd</span><div><b>Creator cards</b><span>Instant spend from wallet balance</span></div><span class="tag t-mute"><i></i>Phase 2</span></div>
+        <p class="zone-note">Swap any rail without touching balances or history. The ledger is the record; rails only move cash.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FLOW ================= -->
+  <section class="screen" data-screen="flow">
+    <div class="head">
+      <div><h1>How money moves, step by step</h1>
+      <p>Four stages, twenty-two steps. Pick a stage, then a step, to see which systems act on it. Only one step in the whole chain is manual.</p></div>
+      <button class="btn pri" id="playStage">Play this stage</button>
+    </div>
+    <div class="stagebar" id="stagebar"></div>
+    <div class="card">
+      <div class="systems" id="systems"></div>
+      <p class="sub" style="margin:4px 0 16px">Dashed = regulated edge (external). Solid = MoonTech's own stack.</p>
+      <div id="pathwrap"></div>
+      <div class="steps" id="steps"></div>
+      <div class="callout mt" id="stagenote"></div>
+    </div>
+  </section>
+
+  <!-- ================= CREDIT ================= -->
+  <section class="screen" data-screen="credit">
+    <div class="head">
+      <div><h1>Brands &amp; credit</h1>
+      <p>The engine scores every brand daily from ledger data and decides who stays prepaid, who gets a buy-now-pay-later offer, and who earns a credit line. Finance sets the rules; the system applies them.</p></div>
+      <button class="btn">Edit credit rules</button>
+    </div>
+
+    <div class="card">
+      <div class="guard">
+        <div>
+          <h2>Exposure guardrail</h2>
+          <p class="sub">Total credit outstanding may not exceed 25% of free cash. Above the cap, new offers queue for Finance approval instead of going out automatically.</p>
+          <div class="guardbar"><div class="fill" style="width:54%"></div><div class="cap" style="left:100%"><span>Cap $575k</span></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink-3);margin-top:8px"><span>Outstanding $312k</span><span>Headroom $263k</span></div>
+        </div>
+        <span class="tag t-in"><i></i>Within cap · offers flowing</span>
+      </div>
+    </div>
+
+    <div class="grid mt" style="grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)">
+      <div class="card" style="padding:18px 8px 8px">
+        <h2 style="padding:0 12px">Brands</h2><p class="sub" style="padding:0 12px">Select a brand to see how the decision was made</p>
+        <div class="tblwrap"><table><thead><tr><th>Brand</th><th>Score</th><th>Decision</th></tr></thead><tbody id="brandrows"></tbody></table></div>
+      </div>
+      <div class="card" id="branddetail"></div>
+    </div>
+
+    <div class="card mt">
+      <h2>The decision ladder</h2><p class="sub">Same rules for every brand. A brand moves up or down the ladder as its ledger history changes.</p>
+      <div class="ladder" id="ladder"></div>
+    </div>
+  </section>
+
+  <!-- ================= BRAND APP ================= -->
+  <section class="screen" data-screen="brandapp">
+    <div class="head">
+      <div><h1>The offer, as the brand sees it</h1>
+      <p>When the engine flags a brand as BNPL-eligible and close to its next milestone, the offer appears in-app at the moment it's most useful.</p></div>
+      <button class="btn gold" id="replay">Replay the offer</button>
+    </div>
+    <div class="stagewrap">
+      <div class="phone">
+        <div class="scr" id="scr">
+          <div class="toast" id="toast"></div>
+          <div class="pt"><span class="glow"></span>
+            <div class="me"><i>DO</i>Dar Oud · brand wallet</div>
+            <div class="bl">Available credit</div>
+            <div class="bv" id="walbal">$2,150</div>
+            <div class="row"><div><div class="k">Spent this year</div><div class="v">$19,600</div></div><div><div class="k">ARPA goal</div><div class="v">$24,000</div></div></div>
+          </div>
+          <div class="pb">
+            <h4>ROAS ladder</h4>
+            <div class="ms"><div class="done">M1<br>1x</div><div class="done">M2<br>2x</div><div class="done">M3<br>3x</div><div class="cur">M4<br>4x</div><div>M5<br>5x</div></div>
+            <div class="prog"><i style="width:82%"></i></div>
+            <div style="font-size:12px;color:#6A7196;margin-top:6px">82% to your $24k annual goal</div>
+            <h4>Quick actions</h4>
+            <div class="acts"><button class="k">Top up</button><button>New campaign</button><button>Invoices</button></div>
+            <h4>Recent</h4>
+            <div class="li"><span class="ic" style="background:#E3F4EE;color:#178A6A">+</span><div class="g"><b>Wallet top-up</b><span>Saved card · Fri 21:14</span></div><span class="a" style="color:#178A6A">+$3,000</span></div>
+            <div class="li"><span class="ic" style="background:#E4EEFB;color:#2F6FD1">3x</span><div class="g"><b>Milestone 3 verified</b><span>$9,000 sales delivered</span></div><span class="a">done</span></div>
+            <div class="li"><span class="ic" style="background:#F1F2F8;color:#10143A">▶</span><div class="g"><b>Weekend campaign</b><span>4 creators accepted</span></div><span class="a">–$1,850</span></div>
+          </div>
+          <div class="scrim" id="scrim">
+            <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="bnplTitle">
+              <div class="grab"></div>
+              <span class="badge">Pay later · unlocked for you</span>
+              <h3 id="bnplTitle">Unlock milestone 4 today, pay half later</h3>
+              <p>You've cleared three milestones and paid every invoice on time. Start the 4x milestone now without waiting to top up.</p>
+              <div class="split">
+                <div><div class="k">Pay today</div><div class="v">$2,000</div><div class="d">50% of milestone</div></div>
+                <div><div class="k">Pay on 25 Oct</div><div class="v">$2,000</div><div class="d">auto-charged to saved card</div></div>
+              </div>
+              <p class="fine">Target: $16,000 in sales at 4x. If the milestone under-delivers, the shortfall is credited back to your wallet. No fees.</p>
+              <button class="cta" id="accept">Start milestone 4</button>
+              <button class="alt" id="decline">Pay the full $4,000 instead</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card explain">
+          <h2>Why Dar Oud got this offer</h2><p class="sub">Every condition comes from ledger data. No one on the team approved it.</p>
+          <div class="item"><span class="ck">✓</span><div><b>Score 68, BNPL tier</b><br><span style="color:var(--ink-3)">Between 65 and 79 on the decision ladder</span></div></div>
+          <div class="item"><span class="ck">✓</span><div><b>3 milestones completed, all paid on time</b><br><span style="color:var(--ink-3)">Average link-to-payment time 1.2 days</span></div></div>
+          <div class="item"><span class="ck">✓</span><div><b>82% of the $24k ARPA goal</b><br><span style="color:var(--ink-3)">Milestone 4 would take them past it</span></div></div>
+          <div class="item"><span class="ck">✓</span><div><b>Exposure cap has headroom</b><br><span style="color:var(--ink-3)">$2,000 deferred fits inside the $263k headroom</span></div></div>
+        </div>
+        <div class="card mt">
+          <h2>If they tap "Start milestone 4"</h2><p class="sub">What the ledger and ERP record, instantly</p>
+          <div class="tblwrap"><table>
+            <thead><tr><th>Event</th><th>Ledger state</th><th>ERP</th></tr></thead>
+            <tbody>
+              <tr><td>$2,000 charged to saved card</td><td><span class="tag t-in"><i></i>Paid in</span></td><td>Tax invoice + cash receipt</td></tr>
+              <tr><td>$2,000 deferred to 25 Oct</td><td><span class="tag t-credit"><i></i>Credit extended</span></td><td>BNPL receivable</td></tr>
+              <tr><td>$4,000 milestone ring-fenced</td><td><span class="tag t-held"><i></i>Held unearned</span></td><td>Deferred income</td></tr>
+              <tr><td>25 Oct auto-charge</td><td><span class="tag t-in"><i></i>Paid in</span></td><td>Receivable cleared</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BRAND WALLET ================= -->
+  <section class="screen" data-screen="brandwallet">
+    <div class="head">
+      <div><h1>Brand wallet</h1>
+      <p>What a brand's marketing team sees in the MoonTech app: credit they can spend any time, milestones in progress, and every invoice in one place. Balances are read from the ledger; the app never holds money.</p></div>
+      <span class="sample">Ounass · sample data</span>
+    </div>
+
+    <div class="phones">
+      <!-- Home -->
+      <div class="pcol">
+        <div class="phone sm"><div class="scr">
+          <div class="pt"><span class="glow"></span>
+            <div class="me"><i>OU</i>Ounass · wallet</div>
+            <div class="bl">Available to spend</div>
+            <div class="bv">$8,450</div>
+            <div class="row"><div><div class="k">Held for milestone 5</div><div class="v">$16,000</div></div><div><div class="k">Credit line left</div><div class="v">$12,000</div></div></div>
+          </div>
+          <div class="pb tab">
+            <div class="acts"><button class="k">Top up</button><button>New campaign</button><button>Invoices</button></div>
+            <h4>Running now</h4>
+            <div class="camp">
+              <div class="top"><b>ROAS milestone 5 · 5x</b><span class="st b">In progress</span></div>
+              <div class="meta">Target $80,000 in sales · $51,200 so far</div>
+              <div class="prog"><i style="width:64%"></i></div>
+              <div class="meta" style="margin-top:6px">Final result confirmed after the returns window</div>
+            </div>
+            <div class="camp">
+              <div class="top"><b>Ramadan edit · fixed</b><span class="st g">Live</span></div>
+              <div class="meta">6 creators accepted · $4,800 spent from wallet</div>
+            </div>
+            <h4>Credit line</h4>
+            <div class="camp">
+              <div class="top"><b>$28,000 used of $40,000</b><span class="st v">Due 30 Sep</span></div>
+              <div class="meta">Monthly statement, paid by saved card</div>
+            </div>
+          </div>
+          <div class="tabbar"><span><b>⌂</b>Home</span><span><b>▶</b>Campaigns</span><span class="on"><b>▣</b>Wallet</span><span><b>◎</b>Profile</span></div>
+        </div></div>
+        <div class="cap">Wallet home<span>Spendable credit, money held for ROAS, and credit line in one glance</span></div>
+      </div>
+
+      <!-- Top up -->
+      <div class="pcol">
+        <div class="phone sm"><div class="scr">
+          <div class="apbar"><span class="bk">←</span>Top up wallet</div>
+          <div class="pb">
+            <div class="bigamt" id="tuAmt">$5,000</div>
+            <div class="bigsub">Credit added to your wallet</div>
+            <div class="chips" id="tuChips">
+              <button data-v="1000">$1,000</button><button data-v="5000" class="sel">$5,000</button><button data-v="10000">$10,000</button><button data-v="25000">$25,000</button>
+            </div>
+            <div class="tabs-in"><span class="on">USD</span><span>AED</span><span>SAR</span></div>
+            <h4>Pay with</h4>
+            <button class="opt sel"><span class="lg">VISA</span><div><b>Visa ending 4417</b><small>Saved company card</small></div><span class="rd"></span></button>
+            <button class="opt"><span class="lg">＋</span><div><b>New card or Apple Pay</b><small>Saved for next time</small></div><span class="rd"></span></button>
+            <div class="sumbox">
+              <div class="sumrow"><span>Wallet credit</span><b id="tuCredit">$5,000.00</b></div>
+              <div class="sumrow"><span>VAT 5%</span><b id="tuVat">$250.00</b></div>
+              <div class="sumrow tot"><span>Total charged</span><b id="tuTot">$5,250.00</b></div>
+              <div class="sumrow"><span>Invoice issued to</span><b style="font-family:var(--font);font-weight:600">Ounass</b></div>
+            </div>
+            <button class="bigbtn" id="tuBtn">Pay $5,250</button>
+            <p class="fine2">Credit is available the moment payment is confirmed, any day, any hour. Your tax invoice is emailed straight away.</p>
+          </div>
+        </div></div>
+        <div class="cap">Top up, 24/7<span>Friday-night top-up for a weekend campaign; invoice goes to the brand, not the card holder</span></div>
+      </div>
+
+      <!-- Activity -->
+      <div class="pcol">
+        <div class="phone sm"><div class="scr">
+          <div class="apbar"><span class="bk">←</span>Activity &amp; invoices</div>
+          <div class="pb">
+            <div class="tabs-in"><span class="on">All</span><span>Top-ups</span><span>Campaigns</span><span>Refunds</span></div>
+            <div class="sumbox" style="margin-top:0">
+              <div class="sumrow"><span>September in</span><b style="color:#178A6A">+$21,640</b></div>
+              <div class="sumrow"><span>September spent</span><b>–$20,800</b></div>
+            </div>
+            <div class="stmt">
+              <div class="r"><div><b>Wallet top-up</b><span>24 Sep · MT-2231 <span class="pdf">PDF</span></span></div><span class="a" style="color:#178A6A">+$5,000</span></div>
+              <div class="r"><div><b>Milestone 5 unlocked</b><span>22 Sep · held until verified · MT-2217 <span class="pdf">PDF</span></span></div><span class="a">–$16,000</span></div>
+              <div class="r"><div><b>Ramadan edit · 6 creators</b><span>18 Sep · per ad, on acceptance</span></div><span class="a">–$4,800</span></div>
+              <div class="r"><div><b>Milestone 4 verified</b><span>12 Sep · $64,000 sales, target met</span></div><span class="st g">Earned</span></div>
+              <div class="r"><div><b>Shortfall credit · milestone 3</b><span>05 Sep · returned to wallet</span></div><span class="a" style="color:#2F6FD1">+$640</span></div>
+              <div class="r"><div><b>Credit line statement</b><span>01 Sep · $28,000 due 30 Sep <span class="pdf">PDF</span></span></div><span class="st v">Open</span></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="cap">Activity &amp; invoices<span>Every movement with its reason and invoice; shortfalls come back as credit</span></div>
+      </div>
+    </div>
+
+    <div class="section-notes">
+      <div class="card"><h2>Brand stays inside MoonTech</h2><p>Under-delivered milestones refund as wallet credit by default, so the money funds the next campaign instead of leaving. Cash refund stays available on request.</p></div>
+      <div class="card"><h2>No payment-link chaos</h2><p>Saved company card, multi-currency, and the invoice always names the brand. This closes the payer-name and FX gaps in today's gateway setup.</p></div>
+      <div class="card"><h2>Read-only window</h2><p>Every number on these screens comes from the ledger. The app shows balances; the ledger and ERP hold them.</p></div>
+    </div>
+  </section>
+
+  <!-- ================= CREATOR WALLET ================= -->
+  <section class="screen" data-screen="creatorwallet">
+    <div class="head">
+      <div><h1>Creator wallet</h1>
+      <p>What a creator sees: what's ready to withdraw, what's still being verified, and a choice of how to get paid. Withdraw any time, no month-end wait, and the invoice is made for them.</p></div>
+      <span class="sample">@layla.styles · sample data</span>
+    </div>
+
+    <div class="phones">
+      <!-- Home -->
+      <div class="pcol">
+        <div class="phone sm"><div class="scr">
+          <div class="pt" style="background:linear-gradient(150deg,#2A3470,#10143A)"><span class="glow"></span>
+            <div class="me"><i>LS</i>@layla.styles</div>
+            <div class="bl">Ready to withdraw</div>
+            <div class="bv">$1,240</div>
+            <div class="row"><div><div class="k">Being verified</div><div class="v">$300</div></div><div><div class="k">Paid this year</div><div class="v">$9,880</div></div></div>
+          </div>
+          <div class="pb tab">
+            <div class="acts"><button class="k">Withdraw</button><button>Statement</button></div>
+            <h4>Earnings</h4>
+            <div class="camp">
+              <div class="top"><b>Ounass · Ramadan edit</b><span class="st g">Earned</span></div>
+              <div class="meta">Paid on acceptance · 18 Sep</div>
+              <div class="top" style="margin-top:6px"><span class="meta" style="margin:0">Fixed campaign</span><b class="mono" style="color:#178A6A">+$420</b></div>
+            </div>
+            <div class="camp">
+              <div class="top"><b>Dar Oud · milestone 4</b><span class="st b">Verifying</span></div>
+              <div class="meta">Final after the returns window · around 12 Oct</div>
+              <div class="top" style="margin-top:6px"><span class="meta" style="margin:0">Performance campaign</span><b class="mono" style="color:#6A7196">$300</b></div>
+            </div>
+            <div class="camp">
+              <div class="top"><b>Sephora · milestone 3</b><span class="st g">Earned</span></div>
+              <div class="meta">Verified sales · 12 Sep</div>
+              <div class="top" style="margin-top:6px"><span class="meta" style="margin:0">Performance campaign</span><b class="mono" style="color:#178A6A">+$820</b></div>
+            </div>
+          </div>
+          <div class="tabbar"><span><b>⌂</b>Home</span><span><b>✦</b>Briefs</span><span class="on"><b>▣</b>Wallet</span><span><b>◎</b>Profile</span></div>
+        </div></div>
+        <div class="cap">Wallet home<span>Clear split between money that's theirs now and money still being verified</span></div>
+      </div>
+
+      <!-- Withdraw -->
+      <div class="pcol">
+        <div class="phone sm"><div class="scr">
+          <div class="apbar"><span class="bk">←</span>Withdraw</div>
+          <div class="pb">
+            <div class="bigamt">$1,240</div>
+            <div class="bigsub">of $1,240 available · <b style="color:#10143A">Withdraw all</b></div>
+            <h4>Get paid by</h4>
+            <div id="railopts">
+              <button class="opt sel" data-r="bank"><span class="lg">BK</span><div><b>Bank transfer</b><small>Al Rajhi ending 2231</small></div><span class="rd"></span></button>
+              <button class="opt" data-r="gift"><span class="lg">GC</span><div><b>Gift card</b><small>Instant code in-app · 100+ brands</small></div><span class="rd"></span></button>
+              <button class="opt" data-r="pp"><span class="lg">PP</span><div><b>PayPal</b><small>layla.s@…</small></div><span class="rd"></span></button>
+              <button class="opt" disabled><span class="lg">MT</span><div><b>MoonTech card</b><small>Coming soon</small></div><span class="rd"></span></button>
+            </div>
+            <div class="sumbox">
+              <div class="sumrow"><span>You receive</span><b id="wdRecv">$1,240 · SAR 4,650</b></div>
+              <div class="sumrow"><span>Fee</span><b id="wdFee">$0</b></div>
+              <div class="sumrow"><span>Arrives</span><b id="wdTime">1–2 business days</b></div>
+            </div>
+            <button class="bigbtn gold" id="wdBtn">Withdraw to bank</button>
+            <p class="fine2">We create your invoice automatically in ZATCA format. Nothing to upload.</p>
+          </div>
+        </div></div>
+        <div class="cap">Withdraw, your way<span>Bank, gift card or PayPal from one balance; gift cards cover markets where bank payout is hard</span></div>
+      </div>
+
+      <!-- Statement -->
+      <div class="pcol">
+        <div class="phone sm"><div class="scr">
+          <div class="apbar"><span class="bk">←</span>Statement of account</div>
+          <div class="pb">
+            <div class="tabs-in"><span>Aug</span><span class="on">Sep 2026</span><span>Year</span></div>
+            <div class="stmt">
+              <div class="r bal"><div><b>Opening balance</b></div><span class="a">$1,100</span></div>
+              <div class="r"><div><b>Withdrawal to bank</b><span>02 Sep · WD-8812</span></div><span class="a" style="color:#D2583C">–$1,100</span></div>
+              <div class="r"><div><b>Sephora · milestone 3</b><span>12 Sep · verified sales</span></div><span class="a" style="color:#178A6A">+$820</span></div>
+              <div class="r"><div><b>Ounass · Ramadan edit</b><span>18 Sep · campaign accepted</span></div><span class="a" style="color:#178A6A">+$420</span></div>
+              <div class="r bal"><div><b>Closing balance</b></div><span class="a">$1,240</span></div>
+            </div>
+            <h4>Not yet in your balance</h4>
+            <div class="stmt"><div class="r"><div><b>Dar Oud · milestone 4</b><span>Verifying · around 12 Oct</span></div><span class="a" style="color:#6A7196">$300</span></div></div>
+            <h4>Invoices made for you</h4>
+            <div class="stmt">
+              <div class="r"><div><b>SB-KSA-00412</b><span>02 Sep · $1,100 · paid <span class="pdf">PDF</span></span></div><span class="st g">Paid</span></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="cap">Statement of account<span>A live record they can trust, instead of chasing the team on WhatsApp</span></div>
+      </div>
+    </div>
+
+    <div class="section-notes">
+      <div class="card"><h2>Paid in days, not after month-end</h2><p>Withdraw on demand once verified, against a market norm of 15 days after month-end. This is the switching cost Mansour wants for creators.</p></div>
+      <div class="card"><h2>One balance, many rails</h2><p>Bank, gift card and PayPal all draw from the same ledger balance. Gift cards serve the Q4 pilot in Egypt, Iraq and Syria and small payouts in KSA and UAE.</p></div>
+      <div class="card"><h2>Nothing is lost on failure</h2><p>The balance is only debited once the bank or provider confirms. A bounced transfer puts the money straight back in the wallet.</p></div>
+    </div>
+  </section>
+
+  <!-- ================= CREATORS ================= -->
+  <section class="screen" data-screen="creators">
+    <div class="head">
+      <div><h1>Creator payouts</h1>
+      <p>Creators withdraw on demand from their wallet balance instead of waiting for month-end. Each withdrawal passes automatic checks; Finance only sees exceptions and high-value approvals.</p></div>
+      <button class="btn pri">Build next bank batch</button>
+    </div>
+
+    <div class="card">
+      <h2>Withdrawal pipeline, this week</h2><p class="sub">Steps 15 to 22. Counts are withdrawals currently at each step.</p>
+      <div class="pipe">
+        <div><span class="n">15</span><b>Withdrawal requested</b><span class="c">148</span></div>
+        <div><span class="n">16</span><b>Self-billed invoice</b><span class="c">148</span></div>
+        <div><span class="n">17</span><b>Auto checks</b><span class="c">141</span></div>
+        <div><span class="n">18</span><b>Slack AP approval</b><span class="c">9</span></div>
+        <div><span class="n">19</span><b>Bank batch built</b><span class="c">132</span></div>
+        <div class="manual"><span class="n">20 · manual</span><b>Bank executes</b><span class="c">132</span></div>
+        <div><span class="n">21</span><b>Payment matched</b><span class="c">128</span></div>
+        <div><span class="n">22</span><b>Receipt + ERP sync</b><span class="c">128</span></div>
+      </div>
+      <p class="zone-note">The creator wallet is debited only at step 21, when the bank confirms. A bounced transfer restores the balance instead of losing it.</p>
+    </div>
+
+    <div class="grid mt g4">
+      <div class="card"><h2>Avg. time to pay</h2><p class="sub">Request to cash received</p><div class="num" style="font-size:26px">1.6 days</div><p class="sub" style="margin:6px 0 0;color:var(--in)">Market norm: 15 days after month-end</p></div>
+      <div class="card"><h2>Accrued, not withdrawn</h2><p class="sub">Earned balances sitting in wallets</p><div class="num" style="font-size:26px">$214k</div></div>
+      <div class="card"><h2>Below threshold</h2><p class="sub">Accruing until $50 minimum</p><div class="num" style="font-size:26px">1,906</div><p class="sub" style="margin:6px 0 0">creators</p></div>
+      <div class="card"><h2>Blocked by checks</h2><p class="sub">Bank details, duplicates, tax status</p><div class="num" style="font-size:26px;color:var(--owed)">7</div></div>
+    </div>
+
+    <div class="card mt" style="padding:18px 8px 8px">
+      <h2 style="padding:0 12px">Recent withdrawals</h2><p class="sub" style="padding:0 12px">Same wallet, different rails. The creator only sees "paid".</p>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Creator</th><th>Amount</th><th>Rail</th><th>Checks</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><div class="who"><span class="av">LS</span><div><b>@layla.styles</b><br><span style="font-size:12px;color:var(--ink-3)">KSA · ZATCA self-billed</span></div></div></td><td class="mono">$1,240</td><td>Bank transfer</td><td><span class="tag t-in"><i></i>Clean</span></td><td>Matched · step 22</td></tr>
+          <tr><td><div class="who"><span class="av">ME</span><div><b>@mo.eats</b><br><span style="font-size:12px;color:var(--ink-3)">UAE</span></div></div></td><td class="mono">$3,900</td><td>Bank transfer</td><td><span class="tag t-moon"><i></i>Above $2.5k</span></td><td>Awaiting AP in Slack</td></tr>
+          <tr><td><div class="who"><span class="av">HC</span><div><b>@hana.cairo</b><br><span style="font-size:12px;color:var(--ink-3)">Egypt · cross-border pilot</span></div></div></td><td class="mono">$180</td><td>Gift card</td><td><span class="tag t-in"><i></i>Clean</span></td><td>Issued · code delivered in-app</td></tr>
+          <tr><td><div class="who"><span class="av">SB</span><div><b>@samir.baghdad</b><br><span style="font-size:12px;color:var(--ink-3)">Iraq · cross-border pilot</span></div></div></td><td class="mono">$260</td><td>Gift card</td><td><span class="tag t-in"><i></i>Clean</span></td><td>In batch</td></tr>
+          <tr><td><div class="who"><span class="av">YR</span><div><b>@yara.runs</b><br><span style="font-size:12px;color:var(--ink-3)">UAE</span></div></div></td><td class="mono">$620</td><td>Bank transfer</td><td><span class="tag t-owed"><i></i>IBAN mismatch</span></td><td>Returned to wallet</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- ================= ERP SYNC ================= -->
+  <section class="screen" data-screen="erp">
+    <div class="head">
+      <div><h1>ERP sync</h1>
+      <p>Each ledger event posts its own journal entry to the ERP automatically. Finance reviews exceptions and reconciliation, not re-keyed data.</p></div>
+      <button class="btn">Run reconciliation now</button>
+    </div>
+
+    <div class="card">
+      <h2>Where the truth lives</h2><p class="sub">Each system owns one kind of truth. Data flows one way, left to right.</p>
+      <div class="syncline">
+        <div class="node">Data warehouse<span>What was earned</span></div><div class="arr"></div>
+        <div class="node">Mamo · Bank<span>What cash moved</span></div><div class="arr"></div>
+        <div class="node core">MoonTech ledger<span>Who is owed what, and why</span></div><div class="arr"></div>
+        <div class="node">ERP<span>The books</span></div><div class="arr"></div>
+        <div class="node">Dashboards · HubSpot<span>Read-only views</span></div>
+      </div>
+    </div>
+
+    <div class="grid g4 mt">
+      <div class="card"><h2>Entries posted today</h2><div class="num" style="font-size:26px;margin-top:10px">1,284</div></div>
+      <div class="card"><h2>Match rate</h2><div class="num" style="font-size:26px;margin-top:10px;color:var(--in)">99.98%</div></div>
+      <div class="card"><h2>Open exceptions</h2><div class="num" style="font-size:26px;margin-top:10px;color:var(--owed)">3</div></div>
+      <div class="card"><h2>Manual entries</h2><div class="num" style="font-size:26px;margin-top:10px">0</div></div>
+    </div>
+
+    <div class="card mt" style="padding:18px 8px 8px">
+      <h2 style="padding:0 12px">Event to journal mapping</h2><p class="sub" style="padding:0 12px">Click an event to see the exact entry it posts. Sample amounts.</p>
+      <div class="tblwrap"><table id="erptable">
+        <thead><tr><th></th><th>Ledger event</th><th>What it means</th><th>ERP posting</th><th>Status</th></tr></thead>
+        <tbody id="erprows"></tbody>
+      </table></div>
+    </div>
+
+    <div class="grid mt" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
+      <div class="card" style="padding:18px 8px 8px">
+        <h2 style="padding:0 12px">Reconciliation · ledger vs ERP</h2><p class="sub" style="padding:0 12px">Checked every hour. Any difference opens an exception.</p>
+        <div class="tblwrap"><table class="recon">
+          <thead><tr><th>Account</th><th>Ledger</th><th>ERP</th><th>Diff</th></tr></thead>
+          <tbody>
+            <tr><td>Brand wallet credits (liability)</td><td class="mono">$1,284,310</td><td class="mono">$1,284,310</td><td><span class="diff0">0</span></td></tr>
+            <tr><td>Deferred ROAS income</td><td class="mono">$521,000</td><td class="mono">$521,000</td><td><span class="diff0">0</span></td></tr>
+            <tr><td>BNPL receivables</td><td class="mono">$118,400</td><td class="mono">$118,400</td><td><span class="diff0">0</span></td></tr>
+            <tr><td>Creator payables</td><td class="mono">$214,760</td><td class="mono">$214,512</td><td><span class="diffx">$248</span></td></tr>
+            <tr><td>VAT output</td><td class="mono">$102,650</td><td class="mono">$102,650</td><td><span class="diff0">0</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <h2>Exceptions</h2><p class="sub">Only these need a human</p>
+        <div class="rail"><span class="ic" style="color:var(--owed)">FX</span><div><b>FX difference on batch B-114</b><span>$248 across 6 SAR payouts · explains the payables diff</span></div></div>
+        <div class="rail"><span class="ic" style="color:var(--owed)">↺</span><div><b>Returned transfer · @yara.runs</b><span>IBAN mismatch · $620 restored to wallet</span></div></div>
+        <div class="rail"><span class="ic" style="color:var(--owed)">2x</span><div><b>Duplicate payout blocked</b><span>Same invoice submitted twice · second rejected at step 17</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  </main>
+</div>
+
+<script>
+/* ---------- routing ---------- */
+const navs=[...document.querySelectorAll('.navbtn')];
+const screens=[...document.querySelectorAll('.screen')];
+function go(id){
+  screens.forEach(s=>s.classList.toggle('on',s.dataset.screen===id));
+  navs.forEach(n=>n.setAttribute('aria-current',n.dataset.go===id?'page':'false'));
+  window.scrollTo({top:0});
+  if(id==='brandapp') setTimeout(openOffer,900);
+}
+navs.forEach(n=>n.addEventListener('click',()=>go(n.dataset.go)));
+
+/* ---------- money flow ---------- */
+const SYS=[
+  {id:'app',n:'Brand app'},{id:'gw',n:'Gateway',edge:1},{id:'led',n:'MoonTech ledger'},
+  {id:'wh',n:'Data warehouse'},{id:'erp',n:'ERP'},{id:'crm',n:'HubSpot'},
+  {id:'capp',n:'Creator app'},{id:'slack',n:'Slack AP'},{id:'bank',n:'Bank',edge:1}
+];
+const STAGES=[
+  {k:'Stage 1',v:'Brand funding',s:'Steps 1 to 5 · credit is paid in',note:'The brand wallet is credited once, only after the gateway confirms. Nothing in this stage touches a creator balance.',
+   steps:[
+    ['1','Funding request','A ROAS milestone unlock or a wallet top-up is raised against the brand.',['app','led']],
+    ['2','Payment link or saved card','The gateway charges the card; FX is handled at collection so USD pricing settles in AED or SAR.',['gw']],
+    ['3','Brand pays','Payment resolves to the brand entity, not the person filling the form.',['app','gw']],
+    ['4','Wallet credited','On gateway confirmation, the brand wallet balance becomes available.',['gw','led','app']],
+    ['5','Tax invoice + receivable posted','Invoice issued the same day and auto-matched to the collection in the ERP.',['led','erp']]
+  ]},
+  {k:'Stage 2',v:'Campaign commitment',s:'Steps 6 to 10 · credit is committed',paths:true,
+   A:{note:'Brand debit and creator credit happen together at acceptance. Both legs commit at once, or neither does.',steps:[
+    ['6','Brand commits','Brand picks creators from the rate card within its wallet balance.',['app','led']],
+    ['7','Route by campaign type','Type is an attribute on the record, so a new campaign type is configuration, not code.',['led']],
+    ['8a','Creator accepts','Creators are notified in-app. Selection alone never moves money.',['capp']],
+    ['9a','Wallet to wallet','Brand wallet debited, creator wallet credited in real time; status written to HubSpot.',['led','app','capp','crm']]
+   ]},
+   B:{note:'The brand has paid, but nothing is earned yet and no creator is owed. Booking this as revenue at collection would overstate income.',steps:[
+    ['6','Brand commits','Brand unlocks the next ROAS milestone.',['app','led']],
+    ['7','Route by campaign type','Routed to the ROAS path.',['led']],
+    ['8b','Credit held unearned','The prepayment is ring-fenced in the ledger. No creator balance moves.',['led']],
+    ['9b','Deferred income posted','ERP records the milestone as a liability until performance is verified.',['led','erp']],
+    ['10b','Creators deliver','The campaign runs; delivery is tracked separately from the ledger.',['capp','wh']]
+   ]}},
+  {k:'Stage 3',v:'Verification',s:'Steps 11 to 14 · credit is earned',note:'One verified figure from the warehouse drives three things at once: revenue, the shortfall refund and the creator payout. The ledger never recalculates it.',
+   steps:[
+    ['11','Sales verified','After the 30 to 60 day returns window, the warehouse confirms final delivered sales.',['wh','led']],
+    ['12','Income recognised','Earned portion released from deferred income to revenue.',['led','erp']],
+    ['13','Shortfall returned','Any unachieved portion is credited back to the brand wallet; fiat refund on request.',['led','app','erp']],
+    ['14','Payout accrued','Creator take rate applied; payout accrues to the creator statement and a payable posts to the ERP.',['led','capp','erp']]
+   ]},
+  {k:'Stage 4',v:'Withdrawal & settlement',s:'Steps 15 to 22 · credit is paid out',note:'Only step 20 is manual. The creator wallet is debited at step 21, so a failed transfer restores the balance.',
+   steps:[
+    ['15','Withdrawal request','Creator withdraws on demand, or automatically once the threshold is met.',['capp','led']],
+    ['16','Self-billed invoice','Built from ledger data with FX, VAT and the ZATCA format for Saudi creators.',['led','erp']],
+    ['17','Automatic checks','Bank details, tax status, duplicates and payee status checked before AP.',['led']],
+    ['18','AP decision in Slack','Approve or reject in Slack; approver and time written back. Small clean payouts pass straight through.',['slack','led']],
+    ['19','Batch file built','Approved withdrawals only, aggregated into a bank-ready file. Gift-card payouts route to the pilot provider.',['led']],
+    ['20','Bank executes · manual','Finance uploads the batch at the bank. The one manual step.',['bank']],
+    ['21','Payment matched','Bank confirmation matched to the invoice; creator wallet debited. Partials and FX stay open as exceptions.',['bank','led','capp']],
+    ['22','Receipt + sync','Receipt filed, settlement posted to the ERP, paid status synced to HubSpot.',['led','erp','crm']]
+   ]}
+];
+let curStage=0,curPath='A',curStep=0,playTimer=null;
+const stagebar=document.getElementById('stagebar');
+STAGES.forEach((s,i)=>{
+  const b=document.createElement('button');b.className='stagebtn';
+  b.innerHTML=`<div class="k">${s.k}</div><div class="v">${s.v}</div><div class="s">${s.s}</div>`;
+  b.addEventListener('click',()=>{stopPlay();curStage=i;curStep=0;renderFlow();});
+  stagebar.appendChild(b);
+});
+function stageData(){const s=STAGES[curStage];return s.paths?s[curPath]:s;}
+function renderFlow(){
+  [...stagebar.children].forEach((b,i)=>b.setAttribute('aria-pressed',i===curStage));
+  const d=stageData();
+  const pw=document.getElementById('pathwrap');
+  pw.innerHTML=STAGES[curStage].paths?`<div class="pathtoggle"><button data-p="A" aria-pressed="${curPath==='A'}">Path A · fixed influencer campaign</button><button data-p="B" aria-pressed="${curPath==='B'}">Path B · ROAS milestone</button></div>`:'';
+  pw.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{stopPlay();curPath=b.dataset.p;curStep=0;renderFlow();}));
+  const st=document.getElementById('steps');st.innerHTML='';
+  d.steps.forEach((x,i)=>{
+    const b=document.createElement('button');b.className='step'+(i===curStep?' on':'');
+    b.innerHTML=`<span class="no">${x[0]}</span><div><b>${x[1]}</b><span>${x[2]}</span></div>`;
+    b.addEventListener('click',()=>{stopPlay();curStep=i;renderFlow();});
+    st.appendChild(b);
+  });
+  const active=d.steps[curStep][3];
+  document.getElementById('systems').innerHTML=SYS.map(s=>`<span class="sys${s.edge?' edge':''}${active.includes(s.id)?' on':''}">${s.n}</span>`).join('');
+  document.getElementById('stagenote').textContent=d.note;
+}
+function stopPlay(){clearInterval(playTimer);playTimer=null;document.getElementById('playStage').textContent='Play this stage';}
+document.getElementById('playStage').addEventListener('click',()=>{
+  if(playTimer){stopPlay();return;}
+  curStep=0;renderFlow();
+  document.getElementById('playStage').textContent='Pause';
+  playTimer=setInterval(()=>{
+    const n=stageData().steps.length;
+    if(curStep<n-1){curStep++;renderFlow();}else{stopPlay();}
+  },1800);
+});
+renderFlow();
+
+/* ---------- credit engine ---------- */
+const TIERS=[
+  {id:'line',range:'80 – 100',name:'Credit line',rule:'Limit = 30% of trailing 90-day spend. Invoiced monthly, pay within 30 days.',color:'var(--in)',soft:'var(--in-soft)'},
+  {id:'bnpl',range:'65 – 79',name:'Buy now, pay later',rule:'50% today, 50% in 30 days on the next milestone or campaign. Auto-charged to saved card.',color:'var(--credit)',soft:'var(--credit-soft)'},
+  {id:'pre',range:'50 – 64',name:'Prepaid + incentives',rule:'Stays prepaid. Engine sends milestone nudges and top-up bonuses to build history.',color:'var(--held)',soft:'var(--held-soft)'},
+  {id:'stop',range:'Below 50 or 30+ days overdue',name:'Paused',rule:'New campaigns paused until overdue balance clears. Existing campaigns run to completion.',color:'var(--owed)',soft:'var(--owed-soft)'}
+];
+const FACT=['Payment speed','ROAS milestones','Spend vs $24k ARPA','Tenure','Overdue & disputes'];
+const W=[25,25,20,15,15];
+const BRANDS=[
+  {n:'Ounass',av:'OU',model:'ROAS · milestone 5',score:91,tier:'line',f:[[23,'0.9 days'],[24,'5 cleared'],[20,'$31.2k'],[12,'14 months'],[12,'none']],
+   out:'Credit line of $40,000 active. $28,000 used. Reviewed monthly; raised automatically if the score holds above 80.',act:'View credit line'},
+  {n:'Sephora',av:'SE',model:'ROAS · milestone 3',score:77,tier:'bnpl',f:[[20,'1.8 days'],[16,'3 cleared'],[17,'$20.4k'],[12,'11 months'],[12,'none']],
+   out:'Eligible for pay-later on milestone 4. Offer scheduled for when they reach 90% of milestone 3 target.',act:'Preview offer'},
+  {n:'Dar Oud',av:'DO',model:'ROAS · milestone 3',score:68,tier:'bnpl',f:[[22,'1.2 days'],[15,'3 cleared'],[16,'$19.6k'],[6,'5 months'],[9,'one late, cleared']],
+   out:'Pay-later offer live in their app: unlock milestone 4 with $2,000 today and $2,000 on 25 Oct.',act:'See it in the brand app'},
+  {n:'Lumen Beauty',av:'LB',model:'Fixed campaigns',score:58,tier:'pre',f:[[17,'3.4 days'],[8,'1 cleared'],[9,'$8.1k'],[9,'7 months'],[15,'none']],
+   out:'Stays prepaid. Engine is sending a top-up bonus nudge to lift spend toward the ARPA goal.',act:'View nudges'},
+  {n:'Kicks KSA',av:'KK',model:'Legacy invoiced',score:44,tier:'stop',f:[[6,'11 days'],[10,'2 cleared'],[14,'$15.0k'],[12,'10 months'],[2,'38 days overdue']],
+   out:'New campaigns paused by rule. $12,400 overdue for 38 days. Unpauses automatically when cleared.',act:'Open collections'}
+];
+let selBrand=2;
+function tierOf(id){return TIERS.find(t=>t.id===id);}
+function renderBrands(){
+  document.getElementById('brandrows').innerHTML=BRANDS.map((b,i)=>{
+    const t=tierOf(b.tier);
+    return `<tr class="click${i===selBrand?' sel':''}" data-i="${i}" tabindex="0"><td><div class="who"><span class="av">${b.av}</span><div><b>${b.n}</b><br><span style="font-size:12px;color:var(--ink-3)">${b.model}</span></div></div></td><td class="mono" style="font-weight:600">${b.score}</td><td><span class="tag" style="background:${t.soft};color:${t.color}"><i></i>${t.name}</span></td></tr>`;
+  }).join('');
+  document.querySelectorAll('#brandrows tr').forEach(r=>{
+    const f=()=>{selBrand=+r.dataset.i;renderBrands();};
+    r.addEventListener('click',f);r.addEventListener('keydown',e=>{if(e.key==='Enter')f();});
+  });
+  const b=BRANDS[selBrand],t=tierOf(b.tier);
+  document.getElementById('branddetail').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+      <div><h2>${b.n}</h2><p class="sub" style="margin:0">${b.model}</p></div>
+      <div class="scorebig"><span class="num" style="color:${t.color}">${b.score}</span><span style="color:var(--ink-3);font-size:13px">/ 100</span></div>
+    </div>
+    <div class="mt">${b.f.map((x,i)=>`<div class="factor"><span>${FACT[i]} <span style="color:var(--ink-3);font-size:11.5px">· ${W[i]}%</span></span><div class="meter"><i style="width:${x[0]/W[i]*100}%;background:${t.color}"></i></div><span class="val">${x[1]}</span><span class="pts">${x[0]}/${W[i]}</span></div>`).join('')}</div>
+    <div class="outcome" style="background:${t.soft}">
+      <span class="tag" style="background:var(--surface);color:${t.color}"><i></i>${t.name}</span>
+      <p style="margin:10px 0 12px;font-size:13.5px">${b.out}</p>
+      <button class="btn ${b.tier==='bnpl'&&b.n==='Dar Oud'?'pri':''}" id="brandAct">${b.act}</button>
+    </div>`;
+  document.getElementById('brandAct').addEventListener('click',()=>{if(b.n==='Dar Oud'||b.n==='Sephora')go('brandapp');});
+  document.getElementById('ladder').innerHTML=TIERS.map(x=>`<div class="rung${x.id===b.tier?' on':''}" style="${x.id===b.tier?'color:'+x.color:''}"><span class="range">${x.range}</span><div><b>${x.name}</b> · ${x.rule}</div></div>`).join('');
+}
+renderBrands();
+
+/* ---------- BNPL popup ---------- */
+const scrim=document.getElementById('scrim'),toast=document.getElementById('toast');
+function openOffer(){toast.classList.remove('show');scrim.classList.add('show');}
+function closeOffer(msg){
+  scrim.classList.remove('show');
+  toast.innerHTML=msg;toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),3800);
+}
+document.getElementById('accept').addEventListener('click',()=>{
+  closeOffer('<b>Milestone 4 is live.</b> $2,000 charged today · $2,000 due 25 Oct');
+  document.getElementById('walbal').textContent='$2,150';
+});
+document.getElementById('decline').addEventListener('click',()=>closeOffer('<b>Top-up started.</b> Pay $4,000 to unlock milestone 4'));
+document.getElementById('replay').addEventListener('click',openOffer);
+scrim.addEventListener('click',e=>{if(e.target===scrim)scrim.classList.remove('show');});
+
+/* ---------- brand wallet: top-up chips ---------- */
+const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+document.querySelectorAll('#tuChips button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#tuChips button').forEach(x=>x.classList.toggle('sel',x===b));
+  const v=+b.dataset.v, vat=v*0.05, tot=v+vat;
+  document.getElementById('tuAmt').textContent='$'+v.toLocaleString('en-US');
+  document.getElementById('tuCredit').textContent=fmt(v);
+  document.getElementById('tuVat').textContent=fmt(vat);
+  document.getElementById('tuTot').textContent=fmt(tot);
+  document.getElementById('tuBtn').textContent='Pay $'+tot.toLocaleString('en-US');
+}));
+
+/* ---------- creator wallet: rail selection ---------- */
+const RAILS={
+  bank:{recv:'$1,240 · SAR 4,650',fee:'$0',time:'1–2 business days',btn:'Withdraw to bank'},
+  gift:{recv:'$1,240 gift card value',fee:'$0',time:'Instant, code in-app',btn:'Get gift card'},
+  pp:{recv:'$1,240 to PayPal',fee:'PayPal fees may apply',time:'Same day',btn:'Withdraw to PayPal'}
+};
+document.querySelectorAll('#railopts .opt:not([disabled])').forEach(o=>o.addEventListener('click',()=>{
+  document.querySelectorAll('#railopts .opt').forEach(x=>x.classList.toggle('sel',x===o));
+  const r=RAILS[o.dataset.r];
+  document.getElementById('wdRecv').textContent=r.recv;
+  document.getElementById('wdFee').textContent=r.fee;
+  document.getElementById('wdTime').textContent=r.time;
+  document.getElementById('wdBtn').textContent=r.btn;
+}));
+
+/* ---------- ERP mapping ---------- */
+const ERP=[
+  {e:'Brand top-up',m:'Brand buys credit to spend later',p:'Cash in, credit owed to brand',s:'in',
+   j:[['Dr','Bank · Mamo clearing','$10,500'],['Cr','Brand wallet credits (liability)','$10,000'],['Cr','VAT output','$500']]},
+  {e:'ROAS milestone paid',m:'Prepaid, not yet earned',p:'Deferred income',s:'held',
+   j:[['Dr','Bank · Mamo clearing','$4,200'],['Cr','Deferred ROAS income','$4,000'],['Cr','VAT output','$200']]},
+  {e:'BNPL accepted',m:'Half paid now, half owed in 30 days',p:'Receivable + deferred income',s:'credit',
+   j:[['Dr','Bank · Mamo clearing','$2,100'],['Dr','BNPL receivable','$2,100'],['Cr','Deferred ROAS income','$4,000'],['Cr','VAT output','$200']]},
+  {e:'Fixed campaign accepted',m:'Creators accepted; brand spends credit',p:'Revenue + creator payable',s:'in',
+   j:[['Dr','Brand wallet credits (liability)','$4,200'],['Cr','Campaign revenue','$4,200'],['Dr','Creator cost of sales','$3,150'],['Cr','Creator payables','$3,150']]},
+  {e:'ROAS milestone verified',m:'Warehouse confirms sales; split three ways',p:'Revenue, refund to wallet, payout accrual',s:'in',
+   j:[['Dr','Deferred ROAS income','$4,000'],['Cr','ROAS revenue (earned 79%)','$3,160'],['Cr','Brand wallet credits (shortfall)','$840'],['Dr','Creator cost of sales','$2,370'],['Cr','Creator payables','$2,370']]},
+  {e:'Creator payout settled',m:'Bank confirmed the transfer',p:'Payable cleared',s:'owed',
+   j:[['Dr','Creator payables','$1,240'],['Cr','Bank','$1,240']]},
+  {e:'Gift card payout',m:'Cross-border pilot creator paid in gift card',p:'Payable cleared via provider',s:'owed',
+   j:[['Dr','Creator payables','$180'],['Cr','Gift card provider clearing','$180']]}
+];
+const STAT={in:'t-in',held:'t-held',credit:'t-credit',owed:'t-owed'};
+const tb=document.getElementById('erprows');
+tb.innerHTML=ERP.map((r,i)=>`
+  <tr class="click" data-i="${i}" tabindex="0"><td style="width:28px"><span class="caret">▶</span></td><td><b>${r.e}</b></td><td style="color:var(--ink-2)">${r.m}</td><td><span class="tag ${STAT[r.s]}"><i></i>${r.p}</span></td><td style="color:var(--in);font-size:12.5px;font-weight:600">Posted</td></tr>
+  <tr class="je" id="je${i}"><td colspan="5"><div class="jlines">${r.j.map(l=>`<div class="jl"><span class="dc ${l[0]==='Dr'?'dr':'cr'}">${l[0]}</span><span>${l[1]}</span><span class="am">${l[2]}</span></div>`).join('')}</div></td></tr>`).join('');
+tb.querySelectorAll('tr.click').forEach(r=>{
+  const f=()=>{r.classList.toggle('open');document.getElementById('je'+r.dataset.i).classList.toggle('show');};
+  r.addEventListener('click',f);r.addEventListener('keydown',e=>{if(e.key==='Enter')f();});
+});
+tb.querySelector('tr.click').click();
+</script>
+</body>
+</html>
