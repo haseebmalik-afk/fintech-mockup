@@ -310,6 +310,78 @@ tr.open .caret{transform:rotate(90deg)}
 .section-notes .card h2{font-size:14px;margin-bottom:6px}
 @media (max-width:1100px){.section-notes{grid-template-columns:1fr}}
 
+/* ---------- wallet-to-wallet transfer ---------- */
+.w2w{display:grid;grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr);gap:18px;align-items:stretch}
+@media (max-width:960px){.w2w{grid-template-columns:1fr}}
+.w2w .col h2{margin:0 0 3px;font-size:15px;font-weight:600}
+.w2w .col .sub{margin:0 0 14px}
+.srcwallet{background:linear-gradient(150deg,#1D2552,#10143A);color:#fff;border-radius:var(--r);padding:16px 18px;margin-bottom:14px;position:relative;overflow:hidden}
+.srcwallet .glow{position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF0C4,#E4B040 40%,transparent 70%);opacity:.4}
+.srcwallet .k{font-size:12px;color:#AEB4D8;position:relative}
+.srcwallet .v{font-family:var(--display);font-size:30px;font-weight:500;position:relative;line-height:1;margin-top:3px}
+.srcwallet .after{font-size:12px;color:#C9CEEA;margin-top:8px;position:relative}
+.srcwallet .after b{color:#E4B040}
+.ratecard{border:1px solid var(--line);border-radius:var(--r-s);padding:0;overflow:hidden}
+.crrow{display:grid;grid-template-columns:26px minmax(0,1fr) auto auto;gap:11px;align-items:center;padding:11px 13px;border-top:1px solid var(--line-2);cursor:pointer;background:var(--surface)}
+.crrow:first-child{border-top:0}
+.crrow:hover{background:var(--surface-2)}
+.crrow.pick{background:var(--moon-soft)}
+.crrow .cb{width:20px;height:20px;border-radius:6px;border:2px solid #C8CCDD;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+.crrow.pick .cb{background:var(--moon);border-color:var(--moon);color:#1B1606}
+.crrow .nm{font-weight:600;font-size:13.5px}
+.crrow .mt2{font-size:11.5px;color:var(--ink-3)}
+.crrow .rate{font-family:var(--mono);font-size:13px;font-weight:500;text-align:right}
+.crrow .foll{font-size:11px;color:var(--ink-3);text-align:right}
+.arrowcol{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--moon)}
+.arrowcol .track{width:2px;flex:1;background:linear-gradient(180deg,transparent,var(--moon),transparent);position:relative;min-height:60px}
+.arrowcol .coin2{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 33% 30%,#FFF0C4,#E4B040 55%,#A97A1C);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#1B1606;box-shadow:0 4px 12px #E4B04055}
+.arrowcol .lbl{font-size:11px;color:var(--ink-3);text-align:center;font-weight:600}
+.destwallet{border:1px solid var(--line);border-radius:var(--r-s);padding:11px 13px;margin-bottom:8px;display:flex;align-items:center;gap:11px;opacity:.5;transition:opacity .3s,border-color .3s}
+.destwallet.live{opacity:1;border-color:var(--in)}
+.destwallet .av{width:30px;height:30px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:var(--ink-2)}
+.destwallet .nm{font-weight:600;font-size:13px}
+.destwallet .stt{font-size:11px;color:var(--ink-3)}
+.destwallet .amt2{margin-left:auto;font-family:var(--mono);font-size:13px;font-weight:500}
+.destwallet.live .amt2{color:var(--in)}
+.txnbar{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-s);padding:13px 15px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px}
+.txnbar .big{font-family:var(--display);font-size:22px;font-weight:500}
+.txnbar .lbl{font-size:12px;color:var(--ink-3)}
+.ledgerpost{margin-top:14px;border:1px dashed var(--line);border-radius:var(--r-s);padding:0;overflow:hidden;opacity:0;max-height:0;transition:opacity .4s}
+.ledgerpost.show{opacity:1;max-height:400px}
+.ledgerpost .h{background:var(--night);color:#fff;padding:9px 14px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px}
+.ledgerpost .jl{display:grid;grid-template-columns:44px minmax(0,1fr) 120px;gap:10px;font-size:12.5px;padding:8px 14px;border-top:1px solid var(--line-2)}
+.ledgerpost .jl .dc{font-family:var(--mono);font-weight:500}
+.ledgerpost .jl .dc.dr{color:var(--held)}.ledgerpost .jl .dc.cr{color:var(--in)}
+.ledgerpost .jl .am{font-family:var(--mono);text-align:right}
+
+/* ---------- brand invoices view ---------- */
+.invtabs{display:flex;gap:3px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;margin-bottom:14px;max-width:420px}
+.invtabs button{flex:1;border:0;background:transparent;padding:8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink-3)}
+.invtabs button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px #10143A14}
+.invrow td{vertical-align:middle}
+.invno{font-family:var(--mono);font-size:12.5px;font-weight:500}
+.invtype{font-size:11.5px;color:var(--ink-3)}
+.dl{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--held);border:1px solid var(--held-soft);background:var(--held-soft);border-radius:7px;padding:4px 9px;cursor:pointer}
+.invprev{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:0;overflow:hidden;position:sticky;top:20px}
+.invprev .pg{padding:22px 24px}
+.invprev .brandline{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:16px}
+.invprev .brandline .co{font-family:var(--display);font-weight:700;font-size:19px;display:flex;align-items:center;gap:9px}
+.invprev .brandline .moonball{width:26px;height:26px}
+.invprev .brandline .meta{text-align:right;font-size:11.5px;color:var(--ink-3);line-height:1.7}
+.invprev h3{margin:0 0 2px;font-size:15px}
+.invgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.invgrid .bx .k{font-size:11px;color:var(--ink-3);margin-bottom:3px}
+.invgrid .bx .v{font-size:13px;font-weight:500}
+.invtable{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+.invtable th{padding:8px 10px;background:var(--surface-2);color:var(--ink-3);font-size:11px}
+.invtable td{padding:9px 10px;border-top:1px solid var(--line-2)}
+.invtable .r{text-align:right;font-family:var(--mono)}
+.invtot{display:flex;flex-direction:column;gap:5px;align-items:flex-end;margin-top:14px;font-size:13px}
+.invtot .line{display:flex;gap:34px;justify-content:space-between;min-width:220px}
+.invtot .line.g{font-weight:700;border-top:1px solid var(--line);padding-top:7px;font-size:14px}
+.invtot .line .mono{font-family:var(--mono)}
+.paidstamp{display:inline-block;border:2px solid var(--in);color:var(--in);font-weight:700;font-size:12px;padding:4px 12px;border-radius:7px;transform:rotate(-6deg);letter-spacing:.06em}
+
 @media (max-width:1100px){
   .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
   .pipe{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -346,6 +418,8 @@ tr.open .caret{transform:rotate(90deg)}
       <p>What users see</p>
       <button class="navbtn" data-go="brandwallet"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12.5h2"/><path d="M3 10h18"/></svg>Brand wallet</button>
       <button class="navbtn" data-go="creatorwallet"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><circle cx="12" cy="9" r="2.5"/><path d="M9 15h6"/></svg>Creator wallet</button>
+      <button class="navbtn" data-go="transfer"><svg viewBox="0 0 24 24"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>Wallet-to-wallet</button>
+      <button class="navbtn" data-go="invoices"><svg viewBox="0 0 24 24"><path d="M6 2h9l3 3v17l-3-2-3 2-3-2-3 2V2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Brand invoices</button>
       <button class="navbtn" data-go="brandapp"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>Brand app · BNPL offer</button>
     </nav>
     <div class="foot">Signed in as Finance<br><b>Haseeb M.</b><br>Sample data · nothing is saved</div>
@@ -538,11 +612,11 @@ tr.open .caret{transform:rotate(90deg)}
             <div class="row"><div><div class="k">Held for milestone 5</div><div class="v">$16,000</div></div><div><div class="k">Credit line left</div><div class="v">$12,000</div></div></div>
           </div>
           <div class="pb tab">
-            <div class="acts"><button class="k">Top up</button><button>New campaign</button><button>Invoices</button></div>
+            <div class="acts"><button class="k" data-jump="transfer">New campaign</button><button data-jump="invoices">Invoices</button><button data-jump="transfer">Run ads</button></div>
             <h4>Running now</h4>
             <div class="camp">
               <div class="top"><b>ROAS milestone 5 · 5x</b><span class="st b">In progress</span></div>
-              <div class="meta">Target $80,000 in sales · $51,200 so far</div>
+              <div class="meta">$16,000 prepaid, held until verified · target $80,000 in sales · $51,200 so far</div>
               <div class="prog"><i style="width:64%"></i></div>
               <div class="meta" style="margin-top:6px">Final result confirmed after the returns window</div>
             </div>
@@ -719,6 +793,85 @@ tr.open .caret{transform:rotate(90deg)}
     </div>
   </section>
 
+  <!-- ================= WALLET TO WALLET ================= -->
+  <section class="screen" data-screen="transfer">
+    <div class="head">
+      <div><h1>Wallet to wallet · running a fixed campaign</h1>
+      <p>The brand picks creators from the rate card. On acceptance, credits move from the brand wallet to each creator wallet in one atomic transaction — both sides post together, or neither does.</p></div>
+      <button class="btn pri" id="resetW2W">Reset</button>
+    </div>
+
+    <div class="w2w">
+      <!-- SOURCE -->
+      <div class="col">
+        <h2>1 · Brand selects creators</h2>
+        <p class="sub">Ounass · fixed awareness campaign · AI-matched shortlist</p>
+        <div class="srcwallet"><span class="glow"></span>
+          <div class="k">Ounass wallet · available to spend</div>
+          <div class="v" id="srcBal">$8,450</div>
+          <div class="after">After this campaign: <b id="srcAfter">$8,450</b></div>
+        </div>
+        <div class="ratecard" id="ratecard"></div>
+        <div class="txnbar">
+          <div><div class="lbl">Selected</div><div class="big" id="selCount">0</div></div>
+          <div><div class="lbl">Campaign total</div><div class="big" id="selTotal">$0</div></div>
+          <button class="btn gold" id="runBtn" style="margin-left:auto" disabled>Launch &amp; notify creators</button>
+        </div>
+      </div>
+
+      <!-- ARROW -->
+      <div class="arrowcol">
+        <div class="track"></div>
+        <div class="coin2" id="coin2" style="opacity:0">AED</div>
+        <div class="lbl" id="flowLbl">wallet<br>to wallet</div>
+        <div class="track"></div>
+      </div>
+
+      <!-- DEST -->
+      <div class="col">
+        <h2>2 · Creators accept, credits land</h2>
+        <p class="sub">Selection alone never moves money. Each acceptance credits that creator's wallet.</p>
+        <div id="destList"></div>
+        <div class="ledgerpost" id="ledgerpost">
+          <div class="h">Posted to the MoonTech ledger · one transaction</div>
+          <div class="jl"><span class="dc dr">Dr</span><span>Ounass wallet credit (liability)</span><span class="am" id="jlTot">$0</span></div>
+          <div class="jl"><span class="dc cr">Cr</span><span>Campaign revenue</span><span class="am" id="jlRev">$0</span></div>
+          <div class="jl"><span class="dc dr">Dr</span><span>Creator cost of sales</span><span class="am" id="jlCost">$0</span></div>
+          <div class="jl"><span class="dc cr">Cr</span><span>Creator payables (across selected wallets)</span><span class="am" id="jlPay">$0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-notes">
+      <div class="card"><h2>Closed-loop, no stored value</h2><p>Credits move between internal wallets. No real money leaves until a creator later taps withdraw. The ledger holds the balances; the wallets display them.</p></div>
+      <div class="card"><h2>Atomic, or nothing</h2><p>The brand debit and every creator credit commit together. A half-finished transfer — the failure Evgeny flagged from Tabby — can't leave one side richer than the other.</p></div>
+      <div class="card"><h2>Rate card drives the amount</h2><p>Each creator's price comes from their rate card in the ledger. Change the selection and the campaign total, revenue and payables all recompute.</p></div>
+    </div>
+  </section>
+
+  <!-- ================= BRAND INVOICES ================= -->
+  <section class="screen" data-screen="invoices">
+    <div class="head">
+      <div><h1>Brand invoices</h1>
+      <p>What Ounass sees when they tap "Invoices" in their wallet. Every collection auto-generates a tax invoice from the ledger — no one on the AR team keys it. Select an invoice to preview it.</p></div>
+      <span class="sample">Ounass · sample data</span>
+    </div>
+
+    <div class="invtabs">
+      <button class="on" data-f="all">All</button>
+      <button data-f="paid">Paid</button>
+      <button data-f="open">Open</button>
+      <button data-f="credit">Credit notes</button>
+    </div>
+
+    <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:18px">
+      <div class="card" style="padding:16px 8px 8px">
+        <div class="tblwrap"><table><thead><tr><th>Invoice</th><th>Date</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody id="invrows"></tbody></table></div>
+      </div>
+      <div id="invpreviewwrap"></div>
+    </div>
+  </section>
+
   <!-- ================= CREATORS ================= -->
   <section class="screen" data-screen="creators">
     <div class="head">
@@ -835,6 +988,7 @@ function go(id){
   if(id==='brandapp') setTimeout(openOffer,900);
 }
 navs.forEach(n=>n.addEventListener('click',()=>go(n.dataset.go)));
+document.querySelectorAll('[data-jump]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.jump)));
 
 /* ---------- money flow ---------- */
 const SYS=[
@@ -1013,6 +1167,154 @@ document.querySelectorAll('#railopts .opt:not([disabled])').forEach(o=>o.addEven
   document.getElementById('wdTime').textContent=r.time;
   document.getElementById('wdBtn').textContent=r.btn;
 }));
+
+/* ---------- wallet-to-wallet ---------- */
+const CREATORS=[
+  {id:'layla',nm:'@layla.styles',mt:'KSA · beauty · 24k',foll:'ER 4.8%',rate:420},
+  {id:'mo',nm:'@mo.eats',mt:'UAE · food · 58k',foll:'ER 3.9%',rate:300},
+  {id:'sara',nm:'@sara.home',mt:'UAE · lifestyle · 41k',foll:'ER 5.1%',rate:360},
+  {id:'hana',nm:'@hana.cairo',mt:'Egypt · fashion · 12k',foll:'ER 6.2%',rate:180},
+  {id:'yara',nm:'@yara.runs',mt:'UAE · fitness · 33k',foll:'ER 4.4%',rate:240}
+];
+const SRC_START=8450;
+let picked=new Set(), launched=false;
+const rc=document.getElementById('ratecard');
+function money(n){return '$'+n.toLocaleString('en-US');}
+function renderRate(){
+  rc.innerHTML=CREATORS.map(c=>`<div class="crrow${picked.has(c.id)?' pick':''}" data-id="${c.id}">
+    <span class="cb">${picked.has(c.id)?'✓':''}</span>
+    <div><div class="nm">${c.nm}</div><div class="mt2">${c.mt}</div></div>
+    <div><div class="rate">${money(c.rate)}</div><div class="foll">${c.foll}</div></div>
+    <div></div></div>`).join('');
+  rc.querySelectorAll('.crrow').forEach(r=>r.addEventListener('click',()=>{
+    if(launched)return;
+    const id=r.dataset.id; picked.has(id)?picked.delete(id):picked.add(id);
+    renderRate(); renderTxn(); renderDest(false);
+  }));
+}
+function selected(){return CREATORS.filter(c=>picked.has(c.id));}
+function total(){return selected().reduce((s,c)=>s+c.rate,0);}
+function renderTxn(){
+  const t=total();
+  document.getElementById('selCount').textContent=picked.size;
+  document.getElementById('selTotal').textContent=money(t);
+  document.getElementById('srcAfter').textContent=money(SRC_START-(launched?t:t));
+  document.getElementById('runBtn').disabled=picked.size===0||launched;
+}
+function renderDest(live){
+  const list=document.getElementById('destList');
+  const sel=selected();
+  if(sel.length===0){list.innerHTML='<div style="color:var(--ink-3);font-size:13px;padding:14px;border:1px dashed var(--line);border-radius:9px">No creators selected yet. Pick from the rate card on the left.</div>';return;}
+  list.innerHTML=sel.map(c=>`<div class="destwallet${live?' live':''}" data-id="${c.id}"><span class="av">${c.nm.slice(1,3).toUpperCase()}</span><div><div class="nm">${c.nm}</div><div class="stt">${live?'Accepted · credited':'Invited · awaiting acceptance'}</div></div><span class="amt2">${live?'+'+money(c.rate):money(c.rate)}</span></div>`).join('');
+}
+function launch(){
+  if(picked.size===0||launched)return;
+  launched=true;
+  const t=total();
+  document.getElementById('runBtn').textContent='Launched ✓';
+  document.getElementById('runBtn').disabled=true;
+  document.getElementById('srcBal').textContent=money(SRC_START-t);
+  document.getElementById('flowLbl').innerHTML='moving<br>'+money(t);
+  const coin=document.getElementById('coin2');
+  coin.style.transition='opacity .3s';coin.style.opacity='1';
+  // reveal destinations one by one
+  const sel=selected();
+  renderDest(false);
+  sel.forEach((c,i)=>setTimeout(()=>{
+    const el=document.querySelector(`.destwallet[data-id="${c.id}"]`);
+    if(el){el.classList.add('live');el.querySelector('.stt').textContent='Accepted · credited';el.querySelector('.amt2').textContent='+'+money(c.rate);}
+    if(i===sel.length-1){
+      const cost=Math.round(t*0.75);
+      document.getElementById('jlTot').textContent=money(t);
+      document.getElementById('jlRev').textContent=money(t);
+      document.getElementById('jlCost').textContent=money(cost);
+      document.getElementById('jlPay').textContent=money(cost);
+      document.getElementById('ledgerpost').classList.add('show');
+      coin.style.opacity='0';
+    }
+  },500+i*450));
+}
+function resetW2W(){
+  picked=new Set();launched=false;
+  document.getElementById('runBtn').textContent='Launch & notify creators';
+  document.getElementById('srcBal').textContent=money(SRC_START);
+  document.getElementById('flowLbl').innerHTML='wallet<br>to wallet';
+  document.getElementById('ledgerpost').classList.remove('show');
+  renderRate();renderTxn();renderDest(false);
+}
+document.getElementById('runBtn').addEventListener('click',launch);
+document.getElementById('resetW2W').addEventListener('click',resetW2W);
+renderRate();renderTxn();renderDest(false);
+
+/* ---------- brand invoices ---------- */
+const INV=[
+  {no:'MT-2231',date:'24 Sep 2026',amt:5250,type:'Wallet top-up',status:'paid',
+   lines:[['Wallet credit top-up',5000]],vat:250,note:'Prepaid credit added to wallet'},
+  {no:'MT-2217',date:'22 Sep 2026',amt:16800,type:'ROAS milestone 5',status:'paid',
+   lines:[['ROAS milestone 5 — prepaid budget (held until verified)',16000]],vat:800,note:'Deferred income until sales verified'},
+  {no:'MT-2198',date:'18 Sep 2026',amt:5040,type:'Fixed campaign · 6 creators',status:'paid',
+   lines:[['Ramadan edit — creator fees (6)',4200],['Management fee',600]],vat:240,note:'Fixed awareness campaign'},
+  {no:'MT-2185',date:'12 Sep 2026',amt:9450,type:'ROAS milestone 4',status:'paid',
+   lines:[['ROAS milestone 4 — earned on verification',9000]],vat:450,note:'Target met, fully earned'},
+  {no:'MT-2170',date:'01 Sep 2026',amt:29400,type:'Credit line statement',status:'open',
+   lines:[['Credit line drawdown — Sep',28000]],vat:1400,note:'Due 30 Sep 2026'},
+  {no:'CN-0044',date:'05 Sep 2026',amt:-672,type:'Shortfall credit · milestone 3',status:'credit',
+   lines:[['ROAS milestone 3 shortfall returned to wallet',-640]],vat:-32,note:'Under-delivery refunded as wallet credit'}
+];
+let invFilter='all', invSel=0;
+const STMAP={paid:['t-in','Paid'],open:['t-credit','Open'],credit:['t-held','Credit note']};
+function renderInvRows(){
+  const rows=INV.map((v,i)=>({v,i})).filter(x=>invFilter==='all'||x.v.status===invFilter);
+  document.getElementById('invrows').innerHTML=rows.map(({v,i})=>{
+    const s=STMAP[v.status];
+    return `<tr class="click invrow${i===invSel?' sel':''}" data-i="${i}" tabindex="0">
+      <td><div class="invno">${v.no}</div><div class="invtype">${v.type}</div></td>
+      <td style="color:var(--ink-2)">${v.date}</td>
+      <td class="mono" style="${v.amt<0?'color:var(--held)':''}">${v.amt<0?'-$'+Math.abs(v.amt).toLocaleString('en-US'):'$'+v.amt.toLocaleString('en-US')}</td>
+      <td><span class="tag ${s[0]}"><i></i>${s[1]}</span></td>
+      <td><span class="dl">↓ PDF</span></td></tr>`;
+  }).join('');
+  document.querySelectorAll('#invrows tr').forEach(r=>{
+    const f=()=>{invSel=+r.dataset.i;renderInvRows();renderInvPreview();};
+    r.addEventListener('click',f);r.addEventListener('keydown',e=>{if(e.key==='Enter')f();});
+  });
+}
+function renderInvPreview(){
+  const v=INV[invSel];
+  const net=v.lines.reduce((s,l)=>s+l[1],0);
+  const neg=v.amt<0;
+  document.getElementById('invpreviewwrap').innerHTML=`
+   <div class="invprev"><div class="pg">
+     <div class="brandline">
+       <div class="co"><span class="moonball"></span>MoonTech</div>
+       <div class="meta">MoonTech PMC · Dubai, UAE<br>TRN 100xxxxxxxxxxxx3<br>${neg?'Credit note':'Tax invoice'} ${v.no}<br>${v.date}</div>
+     </div>
+     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+       <div><h3>Billed to</h3><div style="font-size:13px;color:var(--ink-2)">Ounass<br>Fashion e-commerce<br>TRN 100xxxxxxxxxxxx9</div></div>
+       ${v.status==='paid'?'<span class="paidstamp">PAID</span>':v.status==='open'?'<span class="tag t-credit"><i></i>Due 30 Sep</span>':'<span class="tag t-held"><i></i>Credit</span>'}
+     </div>
+     <div class="invgrid">
+       <div class="bx"><div class="k">Type</div><div class="v">${v.type}</div></div>
+       <div class="bx"><div class="k">Note</div><div class="v">${v.note}</div></div>
+     </div>
+     <table class="invtable"><thead><tr><th style="text-align:left">Description</th><th class="r" style="text-align:right">Amount</th></tr></thead>
+       <tbody>${v.lines.map(l=>`<tr><td>${l[0]}</td><td class="r">${l[1]<0?'-$'+Math.abs(l[1]).toLocaleString('en-US'):'$'+l[1].toLocaleString('en-US')}</td></tr>`).join('')}</tbody></table>
+     <div class="invtot">
+       <div class="line"><span>Subtotal</span><span class="mono">${neg?'-$'+Math.abs(net).toLocaleString('en-US'):'$'+net.toLocaleString('en-US')}</span></div>
+       <div class="line"><span>VAT 5%</span><span class="mono">${neg?'-$'+Math.abs(v.vat).toLocaleString('en-US'):'$'+v.vat.toLocaleString('en-US')}</span></div>
+       <div class="line g"><span>${neg?'Credited':'Total'}</span><span class="mono">${neg?'-$'+Math.abs(v.amt).toLocaleString('en-US'):'$'+v.amt.toLocaleString('en-US')}</span></div>
+     </div>
+     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-3)">Auto-generated from the MoonTech ledger the moment the ${neg?'shortfall was verified':'payment cleared'}. No manual entry.</div>
+   </div></div>`;
+}
+document.querySelectorAll('.invtabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.invtabs button').forEach(x=>x.classList.toggle('on',x===b));
+  invFilter=b.dataset.f;
+  const first=INV.findIndex(v=>invFilter==='all'||v.status===invFilter);
+  if(first>=0)invSel=first;
+  renderInvRows();renderInvPreview();
+}));
+renderInvRows();renderInvPreview();
 
 /* ---------- ERP mapping ---------- */
 const ERP=[
